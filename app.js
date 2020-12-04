@@ -50,6 +50,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
   res.redirect("/");
 });
 
+
 app.get("/", (req, res) => {
   gfs.files.find().toArray((err, files) => {
     // Check if files
@@ -57,6 +58,7 @@ app.get("/", (req, res) => {
       res.render("index", { files: false });
     } else {
       files.map((file) => {
+        console.log(file)
         if (
           file.contentType === "image/jpeg" ||
           file.contentType === "image/png"
@@ -85,6 +87,19 @@ app.get("/files/:filename", (req, res) => {
   });
 });
 
+app.get('/files', (req, res) => {
+  gfs.files.find().toArray((err, files) => {
+      //check if files exist
+      if (!files || files.length == 0) {
+          return res.status(404).json({
+              err: "No files exist"
+          })
+      }
+      // files exist
+      return res.json(files)
+  })
+})
+
 app.get("/image/:filename", (req, res) => {
   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
     // Check if the input is a valid image or not
@@ -105,6 +120,20 @@ app.get("/image/:filename", (req, res) => {
       });
     }
   });
+});
+
+app.get("/image", (req, res) => {
+  gfs.files.find({}, (req, files) => {
+    // Check if the input is a valid image or not
+
+    // If the file exists then check whether it is an image
+    
+      // Read output to browser
+      res.json(files);
+      // const readstream = gfs.createReadStream(file);
+      // readstream.pipe(res);
+    })
+
 });
 
 // delete function to remove the file from the database
